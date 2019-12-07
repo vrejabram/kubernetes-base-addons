@@ -38,6 +38,9 @@ spec:
           elasticsearch.url: http://elasticsearch-kubeaddons-client:9200
           ## Ref: https://www.elastic.co/guide/en/kibana/current/settings.html
           server.basePath: /ops/portal/kibana
+          ## enable audit logs for kibana
+          ## Ref: https://www.elastic.co/guide/en/kibana/current/xpack-security-audit-logging.html
+          xpack.security.audit.enabled: true
       serviceAccount:
         create: true
       service:
