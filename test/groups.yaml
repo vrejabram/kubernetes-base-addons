@@ -16,16 +16,19 @@
 # require any dependencies or significant work to deploy.
 # ------------------------------------------------------------------------------
 general:
+  kubernetesVersion: 1.15.6
+  clusterInterface: kind
+  addons:
+    - "cert-manager"
+    - "dashboard"
+    - "dex"
+    - "external-dns"
+    - "gatekeeper"
+    - "konvoyconfig"
     - "metallb"
     - "opsportal"
-    - "dashboard"
-    - "external-dns"
-    - "cert-manager"
-    - "traefik"
-    - "dex"
-    - "konvoyconfig"
     - "reloader"
-    - "gatekeeper"
+    - "traefik"
 
 # ------------------------------------------------------------------------------
 # ElasticSearch
@@ -33,10 +36,13 @@ general:
 # All ElasticSearch related addons should be tested as a part of this group
 # ------------------------------------------------------------------------------
 elasticsearch:
+  kubernetesVersion: 1.15.6
+  clusterInterface: kind
+  addons:
     - "elasticsearch"
     - "elasticsearchexporter"
-    - "kibana"
     - "fluentbit"
+    - "kibana"
 
 # ------------------------------------------------------------------------------
 # Prometheus
@@ -44,10 +50,13 @@ elasticsearch:
 # All Prometheus related addons should be tested as a part of this group
 # ------------------------------------------------------------------------------
 prometheus:
+  kubernetesVersion: 1.15.6
+  clusterInterface: kind
+  addons:
+    - "dispatch"
+    - "opsportal"
     - "prometheus"
     - "prometheusadapter"
-    - "opsportal"
-    - "dispatch"
 
 # ------------------------------------------------------------------------------
 # Kommander
@@ -83,6 +92,7 @@ istio:
 # These are Addons which tests are currently disabled for.
 # ------------------------------------------------------------------------------
 disabled:
+  addons:
     # kudo gets tested in https://github.com/mesosphere/kubeaddons-enterprise, and is likely going to be removed from this repository.
     # See: https://jira.mesosphere.com/browse/DCOS-61842
     - "kudo"

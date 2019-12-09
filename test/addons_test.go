@@ -26,7 +26,13 @@ import (
 
 const defaultKubernetesVersion = "1.15.6"
 
-var addonTestingGroups = make(map[string][]string)
+type TestGroup struct {
+	clusterInterface  string    `yaml:"clusterInterface,omitempty"`
+	kubernetesVersion string    `yaml:"kubernetesVersion,omitempty"`
+	addons 			  []string	`yaml:"addons,omitempty"`
+}
+
+var addonTestingGroups = make(map[string]TestGroup)
 
 func init() {
 	b, err := ioutil.ReadFile("groups.yaml")
@@ -92,12 +98,12 @@ func TestIstioGroup(t *testing.T) {
 func testgroup(t *testing.T, groupname string) error {
 	t.Logf("testing group %s", groupname)
 
-	version, err := semver.Parse(defaultKubernetesVersion)
-	if err != nil {
-		return err
+	testGroup, ok := addonTestingGroups[groupname]
+	if !ok {
+		return fmt.Errorf("%s group does not exist in groups.yaml", groupname)
 	}
-
-	cluster, err := kind.NewCluster(version)
+	// Get correct interface here
+	cluster, err := kind.NewCluster(semver.MustParse(testGroup.kubernetesVersion))
 	if err != nil {
 		return err
 	}
@@ -110,8 +116,7 @@ func testgroup(t *testing.T, groupname string) error {
 	if err := deployCertManagerCA(cluster); err != nil {
 		return err
 	}
-
-	addons, err := addons(addonTestingGroups[groupname]...)
+	addons, err := addons(addonTestingGroups[groupname].addons...)
 	if err != nil {
 		return err
 	}
@@ -164,7 +169,7 @@ func findUnhandled() ([]v1beta1.AddonInterface, error) {
 		addon := revisions[0]
 		found := false
 		for _, v := range addonTestingGroups {
-			for _, name := range v {
+			for _, name := range v.addons {
 				if name == addon.GetName() {
 					found = true
 				}
