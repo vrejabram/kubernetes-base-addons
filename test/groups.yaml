@@ -64,6 +64,9 @@ prometheus:
 # All Kommander related addons should be tested as a part of this group
 # ------------------------------------------------------------------------------
 kommander:
+  kubernetesVersion: 1.15.6
+  clusterInterface: kind
+  addons:
     - "metallb"
     - "opsportal"
     - "cert-manager"
@@ -79,12 +82,55 @@ kommander:
 # All Istio related addons should be tested as a part of this group
 # ------------------------------------------------------------------------------
 istio:
+  kubernetesVersion: 1.15.6
+  clusterInterface: kind
+  addons:
     - "prometheus"
     - "metallb"
     - "opsportal"
     - "cert-manager"
     - "istio"
     - "flagger"
+
+
+# ------------------------------------------------------------------------------
+# KonvoyGeneral
+#
+# Testing simple addons using konvoy
+# ------------------------------------------------------------------------------
+konvoyGeneral:
+  clusterInterface: konvoy
+  konvoyProvisioner: docker
+  addons:
+    - "dashboard"
+
+# ------------------------------------------------------------------------------
+# KonvoySecurity
+#
+# Tests that all security addons can be deployed
+# ------------------------------------------------------------------------------
+konvoySecurity:
+  clusterInterface: konvoy
+  konvoyProvisioner: docker
+  addons:
+    - "cert-manager"
+    - "dex"
+    - "dex-k8s-authenticator"
+    - "kube-oidc-proxy"
+    - "metallb"
+    - "traefik"
+    - "traefik-forward-auth"
+
+# ------------------------------------------------------------------------------
+# KonvoyCertManager
+#
+# Testing default cert-manager deployment on konvoy
+# ------------------------------------------------------------------------------
+konvoyCertManager:
+  clusterInterface: konvoy
+  konvoyProvisioner: docker
+  addons:
+    - "cert-manager"
 
 # ------------------------------------------------------------------------------
 # Disabled
@@ -104,6 +150,7 @@ disabled:
     - "awsebsprovisioner"
     - "azuredisk-csi-driver"
     - "azurediskprovisioner"
+    - "metallb"
     - "nvidia"
 
     # the following addons need tests added
@@ -115,3 +162,5 @@ disabled:
     - "localvolumeprovisioner"
     - "defaultstorageclass-protection"
 
+    # konvoyConfig is being deprecated by kep: 20191204-templating
+    - "konvoyconfig"

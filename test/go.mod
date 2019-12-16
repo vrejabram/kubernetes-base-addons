@@ -23,3 +23,5 @@ require (
 )
 
 replace k8s.io/client-go => k8s.io/client-go v0.0.0-20191016111102-bec269661e48
+
+replace github.com/mesosphere/kubeaddons => /Users/jared/git/kubeaddons

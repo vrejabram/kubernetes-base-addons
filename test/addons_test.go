@@ -22,15 +22,19 @@ import (
 	"github.com/mesosphere/kubeaddons/pkg/api/v1beta1"
 	"github.com/mesosphere/kubeaddons/pkg/test"
 	"github.com/mesosphere/kubeaddons/pkg/test/cluster/kind"
+	"github.com/mesosphere/kubeaddons/pkg/test/cluster/konvoy"
 )
 
-const defaultKubernetesVersion = "1.15.6"
-
 type TestGroup struct {
-	clusterInterface  string    `yaml:"clusterInterface,omitempty"`
-	kubernetesVersion string    `yaml:"kubernetesVersion,omitempty"`
-	addons 			  []string	`yaml:"addons,omitempty"`
+	ClusterInterface  string   `yaml:"clusterInterface,omitempty"`
+	KubernetesVersion string   `yaml:"kubernetesVersion,omitempty"`
+	KonvoyProvisioner string   `yaml:"konvoyProvisioner,omitempty"`
+	Addons            []string `yaml:"addons,omitempty"`
 }
+
+const (
+	defaultKonvoyPath = "konvoy"
+)
 
 var addonTestingGroups = make(map[string]TestGroup)
 
@@ -84,12 +88,29 @@ func TestKommanderGroup(t *testing.T) {
 	}
 }
 
+func TestKonvoyGeneralGroup(t *testing.T) {
+	if err := testgroup(t, "konvoyGeneral"); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestIstioGroup(t *testing.T) {
 	if err := testgroup(t, "istio"); err != nil {
 		t.Fatal(err)
 	}
 }
 
+func TestKonvoySecurityGroup(t *testing.T) {
+	if err := testgroup(t, "konvoySecurity"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestKonvoyCertManagerGroup(t *testing.T) {
+	if err := testgroup(t, "konvoyCertManager"); err != nil {
+		t.Fatal(err)
+	}
+}
 
 // -----------------------------------------------------------------------------
 // Private Functions
@@ -103,20 +124,20 @@ func testgroup(t *testing.T, groupname string) error {
 		return fmt.Errorf("%s group does not exist in groups.yaml", groupname)
 	}
 	// Get correct interface here
-	cluster, err := kind.NewCluster(semver.MustParse(testGroup.kubernetesVersion))
+	cluster, err := getClusterFromGroup(testGroup)
 	if err != nil {
 		return err
 	}
 	defer cluster.Cleanup()
 
-	if err := temp.DeployController(cluster); err != nil {
+	if err := temp.DeployController(cluster, testGroup.ClusterInterface); err != nil {
 		return err
 	}
 
 	if err := deployCertManagerCA(cluster); err != nil {
 		return err
 	}
-	addons, err := addons(addonTestingGroups[groupname].addons...)
+	addons, err := addons(addonTestingGroups[groupname].Addons...)
 	if err != nil {
 		return err
 	}
@@ -169,7 +190,7 @@ func findUnhandled() ([]v1beta1.AddonInterface, error) {
 		addon := revisions[0]
 		found := false
 		for _, v := range addonTestingGroups {
-			for _, name := range v.addons {
+			for _, name := range v.Addons {
 				if name == addon.GetName() {
 					found = true
 				}
@@ -271,8 +292,7 @@ configInline:
     addresses:
     - "172.17.1.200-172.17.1.250"
 `,
-	"istio":
-`---
+	"istio": `---
       kiali:
        enabled: true
        contextPath: /ops/portal/kiali
@@ -327,3 +347,20 @@ configInline:
 `,
 }
 
+func getClusterFromGroup(group TestGroup) (test.Cluster, error) {
+
+	if group.ClusterInterface == "kind" {
+		return kind.NewCluster(semver.MustParse(group.KubernetesVersion))
+	} else if group.ClusterInterface == "konvoy" {
+
+		return konvoy.NewKonvoyCluster(getKonvoyPath(), group.KonvoyProvisioner)
+	}
+	return nil, fmt.Errorf("'%s' is not a supported clusterInterface", group.ClusterInterface)
+}
+
+func getKonvoyPath() string {
+	if konvoyPath := os.Getenv("KONVOY_PATH"); konvoyPath != "" {
+		return konvoyPath
+	}
+	return defaultKonvoyPath
+}
