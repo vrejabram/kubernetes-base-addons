@@ -29,6 +29,9 @@ general:
     - "opsportal"
     - "reloader"
     - "traefik"
+    - "kube-oidc-proxy"
+    - "traefik-forward-auth"
+    - "dex-k8s-authenticator"
 
 # ------------------------------------------------------------------------------
 # ElasticSearch
@@ -115,8 +118,8 @@ konvoySecurity:
   addons:
     - "cert-manager"
     - "dex"
-    - "dex-k8s-authenticator"
-    - "kube-oidc-proxy"
+    # - "dex-k8s-authenticator"
+    # - "kube-oidc-proxy"
     - "metallb"
     - "traefik"
     - "traefik-forward-auth"
@@ -145,19 +148,14 @@ disabled:
 
     # these are addons which are currently filtered out of tests because we're waiting on features to be able to test them properly.
     # See: https://jira.mesosphere.com/browse/DCOS-61664
-    - "dex-k8s-authenticator"
     - "awsebscsiprovisioner"
     - "awsebsprovisioner"
     - "azuredisk-csi-driver"
     - "azurediskprovisioner"
-    - "metallb"
     - "nvidia"
 
     # the following addons need tests added
     # See: https://jira.mesosphere.com/browse/DCOS-61664
-    - "traefik-forward-auth"
-    - "dex-k8s-authenticator"
-    - "kube-oidc-proxy"
     - "velero"
     - "localvolumeprovisioner"
     - "defaultstorageclass-protection"
