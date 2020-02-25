@@ -86,8 +86,8 @@ func TestLocalVolumeProvisionerGroup(t *testing.T) {
 	}
 }
 
-func TestNfsGroup(t *testing.T) {
-	if err := testgroup(t, "nfs"); err != nil {
+func TestNfsServerProvisionerGroup(t *testing.T) {
+	if err := testgroup(t, "nfsserverprovisioner"); err != nil {
 		t.Fatal(err)
 	}
 }
