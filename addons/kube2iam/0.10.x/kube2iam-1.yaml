@@ -20,3 +20,24 @@ spec:
     chart: kube2iam
     repo: https://kubernetes-charts.storage.googleapis.com
     version: 2.1.0
+    values: |
+      ---
+      extraArgs:
+        auto-discover-base-arn: true
+        auto-discover-default-role: true
+
+      host:
+        ip: $(HOST_IP)
+        iptables: true
+        interface: cali+
+        port: 8181
+      
+      podLabels:
+        app: kube2iam
+      
+      rbac:
+        create: true
+      
+      updateStrategy: RollingUpdate
+      
+      verbose: false
