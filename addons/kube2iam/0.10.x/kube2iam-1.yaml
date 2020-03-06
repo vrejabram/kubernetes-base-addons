@@ -8,7 +8,7 @@ metadata:
     kubeaddons.mesosphere.io/hack-requires-defaultstorageclass: "true"
   annotations:
     catalog.kubeaddons.mesosphere.io/addon-revision: "0.10.7-1"
-    !!values.chart.helm.kubeaddons.mesosphere.io/kube2iam: "https://raw.githubusercontent.com/jtblin/kube2iam/master/examples/eks-example.yml"
+    values.chart.helm.kubeaddons.mesosphere.io/kube2iam: "https://raw.githubusercontent.com/jtblin/kube2iam/master/examples/eks-example.yml"
 spec:
   namespace: kube-system
   kubernetes:
