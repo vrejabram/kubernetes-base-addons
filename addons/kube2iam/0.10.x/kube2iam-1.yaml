@@ -5,8 +5,6 @@ metadata:
   name: kube2iam
   labels:
     kubeaddons.mesosphere.io/name: kube2iam
-    # TODO: we're temporarily supporting dependency on an existing default storage class
-    # on the cluster, this hack will trigger re-queue on Addons until one exists.
     kubeaddons.mesosphere.io/hack-requires-defaultstorageclass: "true"
   annotations:
     catalog.kubeaddons.mesosphere.io/addon-revision: "0.10.7-1"
@@ -18,12 +16,6 @@ spec:
   cloudProvider:
     - name: aws
       enabled: true
-    - name: azure
-      enabled: true
-    - name: gcp
-      enabled: true
-    - name: none
-      enabled: true
   chartReference:
     chart: kube2iam
     repo: https://kubernetes-charts.storage.googleapis.com
@@ -31,57 +23,57 @@ spec:
     values: |
       ---
       apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: kube2iam
-  namespace: kube-system
-  labels:
-    app: kube2iam
-spec:
-  selector:
-    matchLabels:
-      name: kube2iam
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
+      kind: DaemonSet
+      metadata:
         name: kube2iam
-    spec:
-      serviceAccountName: kube2iam
-      hostNetwork: true
-      containers:
-        - image: jtblin/kube2iam:latest
-          imagePullPolicy: Always
-          name: kube2iam
-          args:
-            - "--auto-discover-base-arn"
-            - "--auto-discover-default-role=true"
-            - "--iptables=true"
-            - "--host-ip=$(HOST_IP)"
-            - "--node=$(NODE_NAME)"
-            - "--host-interface=cali+"
-          env:
-            - name: HOST_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-          ports:
-            - containerPort: 8181
-              hostPort: 8181
-              name: http
-          securityContext:
-            privileged: true
-          volumeMounts:
-            - mountPath: /run/xtables.lock
-              name: xtables-lock
-              readOnly: false
-      volumes:
-        - name: xtables-lock
-          hostPath:
-            path: /run/xtables.lock
-            type: FileOrCreate
+        namespace: kube-system
+        labels:
+          app: kube2iam
+      spec:
+        selector:
+          matchLabels:
+            name: kube2iam
+        updateStrategy:
+          type: RollingUpdate
+        template:
+          metadata:
+            labels:
+              name: kube2iam
+          spec:
+            serviceAccountName: kube2iam
+            hostNetwork: true
+            containers:
+              - image: jtblin/kube2iam:latest
+                imagePullPolicy: Always
+                name: kube2iam
+                args:
+                  - "--auto-discover-base-arn"
+                  - "--auto-discover-default-role=true"
+                  - "--iptables=true"
+                  - "--host-ip=$(HOST_IP)"
+                  - "--node=$(NODE_NAME)"
+                  - "--host-interface=cali+"
+                env:
+                  - name: HOST_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                  - name: NODE_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: spec.nodeName
+                ports:
+                  - containerPort: 8181
+                    hostPort: 8181
+                    name: http
+                securityContext:
+                  privileged: true
+                volumeMounts:
+                  - mountPath: /run/xtables.lock
+                    name: xtables-lock
+                    readOnly: false
+            volumes:
+              - name: xtables-lock
+                hostPath:
+                  path: /run/xtables.lock
+                  type: FileOrCreate
