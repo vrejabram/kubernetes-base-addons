@@ -370,3 +370,15 @@ velero:
       - type: support
         title: Submit a Support Request
         link: https://d2iq.com/services-and-support
+---
+kube2iam:
+  display_name: kube2iam
+  description: kube2iam
+  logo: kube2iam/logo.svg
+  category: other
+  overview: kube2iam/overview.md
+  resources:
+    links:
+      - type: support
+        title: Submit a Support Request
+        link: https://d2iq.com/services-and-support
