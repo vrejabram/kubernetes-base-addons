@@ -7,8 +7,8 @@
 # See more about Velero at:
 #
 # * https://velero.io/
-# * https://github.com/heptio/velero
-# * https://github.com/helm/charts/tree/master/stable/velero
+# * https://github.com/vmware-tanzu/velero
+# * https://github.com/vmware-tanzu/helm-charts
 #
 #
 # Implementation
@@ -58,8 +58,8 @@ spec:
           name: "aws"
           bucket: "velero"
           config:
-            region: "fallback"     # enables non-production fallback minio backend
-            s3ForcePathStyle: true # allows usage of fallback backend
+            region: "fallback"
+            s3ForcePathStyle: true 
             s3Url: http://minio.velero.svc:9000
         volumeSnapshotLocation:
           name: "aws"
